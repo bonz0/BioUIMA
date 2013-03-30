@@ -10,13 +10,22 @@
     <vendor/>
     <configurationParameters/>
     <configurationParameterSettings/>
-    <typeSystemDescription/>
+    <typeSystemDescription>
+      <imports>
+        <import location="DNASequenceTypeSystemDescriptor.xml"/>
+      </imports>
+    </typeSystemDescription>
     <typePriorities/>
     <fsIndexCollection/>
     <capabilities>
       <capability>
         <inputs/>
-        <outputs/>
+        <outputs>
+          <type>bio.uima.DNASequence</type>
+          <feature>bio.uima.DNASequence:value</feature>
+          <feature>bio.uima.DNASequence:end</feature>
+          <feature>bio.uima.DNASequence:begin</feature>
+        </outputs>
         <languagesSupported/>
       </capability>
     </capabilities>

@@ -19,17 +19,17 @@ public class SequenceAlignmentAnnotator extends JCasAnnotator_ImplBase  {
 			System.out.println(seqs[1]);
 			System.out.println();
 			// TODO: implement this	
-			String[] alignment = computeAlignment(seqs[0], seqs[1]);
+			String[] alignment = computeLevenshteinDistance(seqs[0], seqs[1]);
 			JCas alignmentCas = cas.createView("alignment");
-			alignmentCas.setDocumentText(alignment[0]+" "+alignment[1]);
+			alignmentCas.setDocumentText(alignment[0] + " " + alignment[1]);
 		} catch (CASException e) {
 			e.printStackTrace();
 		}
 	}
 
-	// This method should compute a minimum cost alignment 
+	// This method should compute a minimum cost alignment
 	// for the specified sequences.  The cost of an insertion
-	// or delete is 1 and the cost of substitution is 2.  
+	// or delete is 1 and the cost of substitution is 2.
 	// Return marked up strings where insertions/deletes are
 	// represented with a '-'.  
 	//
@@ -67,15 +67,20 @@ public class SequenceAlignmentAnnotator extends JCasAnnotator_ImplBase  {
 		return result;
 	}
 	
-	private String[] computeAlignment(String seq1, String seq2) {
-		// TODO: implement this
+	private String[] computeLevenshteinDistance(String seq1, String seq2) {
+		// enforce that seq1 is longer than seq2
+		// if not, swap seq1 and seq2
+		// for ease of computation
 		if(seq1.length() < seq2.length()) {
 			String temp = seq2;
 			seq2 = seq1;
 			seq1 = temp;
 		}
-		int[][] distances = new int[seq1.length() + 1][seq2.length() + 1];
-		char[][] directions = new char[seq1.length()][seq2.length()];
+		
+		int[][] distances = new int[seq1.length() + 1][seq2.length() + 1];		// stores minimum cost
+		char[][] directions = new char[seq1.length()][seq2.length()];			// stores direction of previous minimum cost
+		
+		// Initialize value
 		distances[0][0] = 0;
 		for(int iii = 1; iii <= seq1.length(); iii++){
 			distances[iii][0] = iii * 2;
@@ -83,9 +88,11 @@ public class SequenceAlignmentAnnotator extends JCasAnnotator_ImplBase  {
 		for(int jjj = 1; jjj <= seq2.length(); jjj++) {
 			distances[0][jjj] = jjj * 2;
 		}
+		
 		for (int iii = 1; iii <= seq1.length(); iii++) {
 			for (int jjj = 1; jjj <= seq2.length(); jjj++) {
 				int diagonal = distances[iii - 1][jjj - 1];
+				// Add cost 1 for substitution
 				if (seq1.charAt(iii - 1) != seq2.charAt(jjj - 1)) {
 					diagonal++;
 				}
@@ -93,10 +100,10 @@ public class SequenceAlignmentAnnotator extends JCasAnnotator_ImplBase  {
 					distances[iii][jjj] = diagonal;
 					directions[iii - 1][jjj - 1] = 'd';
 				} else if (distances[iii - 1][jjj] <= distances[iii][jjj - 1]) {
-					distances[iii][jjj] = distances[iii - 1][jjj] + 2;
+					distances[iii][jjj] = distances[iii - 1][jjj] + 2;		// add 2 to cost for insertion
 					directions[iii - 1][jjj - 1] = 'u';
 				} else {
-					distances[iii][jjj] = distances[iii][jjj - 1] + 2;
+					distances[iii][jjj] = distances[iii][jjj - 1] + 2;		// add 2 to cost for deletion
 					directions[iii - 1][jjj - 1] = 'l';
 				}
 			}
