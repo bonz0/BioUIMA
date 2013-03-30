@@ -6,6 +6,10 @@ import org.apache.uima.analysis_engine.AnalysisEngineDescription;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.util.XMLInputSource;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+
 public class BioUima {
 
 	/**
@@ -56,10 +60,10 @@ public class BioUima {
 
 		// init a CAS
 		JCas jCas = ae.newJCas();
-//		jCas.setDocumentText("AGTGCTACCTAGATTAGT AGTGCTACCTAGATTAGT");
-		jCas.setDocumentText("GTTCGTGATGGTTATATTGCTGATGATAAAGATTGTGCTTATTTTTGTGGTCGTAATGCTTATTGTGATGAAGAATGTAAAAAAGGTGCTGAATCTGGTAAATGTTGGTATGCTGGTCAATATGGTAATGCTTGTTGGTGTTATAAACTTCCTGATTGGGTTCCTATTAAACAAAAAGTTTCTGGTAAATGTAAT AAAGATGGTTATCCTGTTGAATATGATAATTGTGCTTATATTTGTTGGAATTATGATAATGCTTATTGTGATAAACTTTGTAAAGATAAAAAAGCTGATTCTGGTTATTGTTATTGGGTTCATATTCTTTGTTATTGTTATGGTCTTCCTGATTCTGAACCTACTAAAACTAATGGTAAATGTAAATCTGGTAAAAAA");
-//		jCas.setDocumentText("FARHANG FATHNG");
-//		jCas.setDocumentText("FARHANG MISHAL");
+		final String inputFile = "/home/farhang/workspace/BioUIMA/data/dna.txt";
+		String fileText = BioUima.readInputFile(inputFile);
+		jCas.setDocumentText(fileText);
+
 		// process the CAS
 		ae.process(jCas);
 
@@ -69,5 +73,25 @@ public class BioUima {
 		System.out.println(seqs[0]);
 		System.out.println(seqs[1]);
 	}
-
+	
+	private static String readInputFile(String inputFile) {
+		BufferedReader br = null;
+		String fileText = null;
+		try {
+			br = new BufferedReader(new FileReader(inputFile));
+			String currentLine;
+			while((currentLine = br.readLine()) != null) {
+				fileText += currentLine;
+			}
+		} catch(IOException e) {
+			System.out.println("File not found: " + inputFile);
+		} finally {
+			try {
+				if(br != null)	br.close();
+			} catch(IOException e) {
+				e.printStackTrace();
+			}
+		}
+		return fileText;
+	}
 }

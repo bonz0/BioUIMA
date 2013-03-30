@@ -14,9 +14,12 @@ public class SequenceAlignmentAnnotator extends JCasAnnotator_ImplBase  {
 	public void process(JCas cas) throws AnalysisEngineProcessException {
 		// read protein sequences from the CAS 
 		try {
-			String[] seqs = cas.getView("orf1").getDocumentText().split(" ");
+			String[] seqs = cas.getView("protein").getDocumentText().split(" ");
 			System.out.println(seqs[0]);
 			System.out.println(seqs[1]);
+			System.out.println(seqs[2]);
+			System.out.println(seqs[3]);
+			System.out.println(seqs[4]);
 			System.out.println();
 			// TODO: implement this	
 			String[] alignment = computeLevenshteinDistance(seqs[0], seqs[1]);
