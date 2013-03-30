@@ -15,10 +15,9 @@ public class SequenceAlignmentAnnotator extends JCasAnnotator_ImplBase  {
 		// read protein sequences from the CAS 
 		try {
 			String[] seqs = cas.getView("orf1").getDocumentText().split(" ");
-			System.out.println();
-			System.out.println("Sequence Alignment Annotator -> process()");
 			System.out.println(seqs[0]);
 			System.out.println(seqs[1]);
+			System.out.println();
 			// TODO: implement this	
 			String[] alignment = computeAlignment(seqs[0], seqs[1]);
 			JCas alignmentCas = cas.createView("alignment");

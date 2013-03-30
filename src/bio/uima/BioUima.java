@@ -36,7 +36,7 @@ public class BioUima {
 	 * you should create multiple views on the CAS to distinguish DNA from
 	 * protein sequences.  You can print results to STDOUT or 
 	 * serialize the CAS.  Don't worry about upper/lower case.
-	 * We'll be impressed if you use the UIMA type syatem, implement your
+	 * We'll be impressed if you use the UIMA type system, implement your
 	 * own FlowController and take advantage of other UIMA concepts
 	 * that are applicable or describe in detail how your application
 	 * could take advantage of things like UIMA-AS.
@@ -57,7 +57,7 @@ public class BioUima {
 		// init a CAS
 		JCas jCas = ae.newJCas();
 //		jCas.setDocumentText("AGTGCTACCTAGATTAGT AGTGCTACCTAGATTAGT");
-		jCas.setDocumentText("AAAGATGGTTATCTTGTTGATGCTAAAGGTTGTAAAAAAAATTGTTATAAACTTGGTAAAAATGATTATTGTAATCGTGAATGTCGTATGAAACATCGTGGTGGTTCTTATGGTTATTGTTATGGTTTTGGTTGTTATTGTGAAGGTCTTTCTGATTCTACTCCTACTTGGCCTCTTCCTAATAAAACTTGTTCTGGTAAA GATGGTTATATTCGTAAACGTGATGGTTGTAAACTTTCTTGTCTTTTTGGTAATGAAGGTTGTAATAAAGAATGTAAATCTTATGGTGGTTCTTATGGTTATTGTTGGACTTGGGGTCTTGCTTGTTGGTGTGAAGGTCTTCCTGATGAAAAAACTTGGAAATCTGAAACTAATACTTGTGGT");
+		jCas.setDocumentText("GTTCGTGATGGTTATATTGCTGATGATAAAGATTGTGCTTATTTTTGTGGTCGTAATGCTTATTGTGATGAAGAATGTAAAAAAGGTGCTGAATCTGGTAAATGTTGGTATGCTGGTCAATATGGTAATGCTTGTTGGTGTTATAAACTTCCTGATTGGGTTCCTATTAAACAAAAAGTTTCTGGTAAATGTAAT AAAGATGGTTATCCTGTTGAATATGATAATTGTGCTTATATTTGTTGGAATTATGATAATGCTTATTGTGATAAACTTTGTAAAGATAAAAAAGCTGATTCTGGTTATTGTTATTGGGTTCATATTCTTTGTTATTGTTATGGTCTTCCTGATTCTGAACCTACTAAAACTAATGGTAAATGTAAATCTGGTAAAAAA");
 //		jCas.setDocumentText("FARHANG FATHNG");
 //		jCas.setDocumentText("FARHANG MISHAL");
 		// process the CAS
@@ -66,8 +66,6 @@ public class BioUima {
 		// print results to stdout
 		JCas alignment = jCas.getView("alignment");
 		String[] seqs = alignment.getDocumentText().split(" ");
-		System.out.println();
-		System.out.println("BioUima -> main()");
 		System.out.println(seqs[0]);
 		System.out.println(seqs[1]);
 	}
