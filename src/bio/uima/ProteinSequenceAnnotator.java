@@ -26,7 +26,7 @@ public class ProteinSequenceAnnotator extends JCasAnnotator_ImplBase  {
 		Matcher matcher = DNAPattern.matcher(sequencesString);
 		String[] proteins = new String[5];
 		HashMap<String, String> codonTable = ProteinSequenceAnnotator.initMap();
-		
+
 		// Find DNA sequences
 		int iii = 0;
 		int pos = 0;
@@ -39,7 +39,7 @@ public class ProteinSequenceAnnotator extends JCasAnnotator_ImplBase  {
 			annotation.addToIndexes();
 			pos = matcher.end();
 		}
-		
+
 		// TODO: implement this
 		// translate each DNA sequence to a protein sequence considering
 		// all possible open reading frames and store in a CAS view
@@ -51,7 +51,7 @@ public class ProteinSequenceAnnotator extends JCasAnnotator_ImplBase  {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public static String combineStringArray(String[] array) {
 		String returnString = "";
 		for(int iii = 0; iii < array.length; iii++) {
