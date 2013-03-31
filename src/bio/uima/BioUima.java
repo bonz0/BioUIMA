@@ -70,18 +70,28 @@ public class BioUima {
 		// print results to stdout
 		JCas alignment = jCas.getView("alignment");
 		String[] seqs = alignment.getDocumentText().split(" ");
-		System.out.println(seqs[0]);
-		System.out.println(seqs[1]);
+		BioUima.printStringArray(seqs);
 	}
 	
+	public static void printStringArray(String[] array) {
+		for(String temp : array) {
+			System.out.println(temp);
+		}
+		System.out.println();
+	}
+	
+	/*
+	 * @param 	inputFile		: File name to read from
+	 * @return	String read from input file
+	 */
 	private static String readInputFile(String inputFile) {
 		BufferedReader br = null;
-		String fileText = null;
+		String fileText = "";
 		try {
 			br = new BufferedReader(new FileReader(inputFile));
 			String currentLine;
 			while((currentLine = br.readLine()) != null) {
-				fileText += currentLine;
+				fileText += (currentLine + "\n");
 			}
 		} catch(IOException e) {
 			System.out.println("File not found: " + inputFile);

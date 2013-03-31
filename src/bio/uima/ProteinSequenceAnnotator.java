@@ -28,8 +28,9 @@ public class ProteinSequenceAnnotator extends JCasAnnotator_ImplBase  {
 		String sequencesString = cas.getDocumentText();
 		Matcher matcher = DNAPattern.matcher(sequencesString);
 		String[] proteins = new String[5];
-
 		HashMap<String, String> codonTable = ProteinSequenceAnnotator.initMap();
+		
+		// Find DNA sequences, create annotations, and translate to protein sequences
 		int iii = 0;
 		int pos = 0;
 		while(matcher.find(pos)) {
@@ -41,29 +42,25 @@ public class ProteinSequenceAnnotator extends JCasAnnotator_ImplBase  {
 			annotation.addToIndexes();
 			pos = matcher.end();
 		}
-//		String sequencesString = "GTTCGTGATGGTTATATTGCTGATGATAAAGATTGTGCTTATTTTTGTGGTCGTAATGCTTATTGTGATGAAGAATGTAAAAAAGGTGCTGAATCTGGTAAATGTTGGTATGCTGGTCAATATGGTAATGCTTGTTGGTGTTATAAACTTCCTGATTGGGTTCCTATTAAACAAAAAGTTTCTGGTAAATGTAAT AAAGATGGTTATCCTGTTGAATATGATAATTGTGCTTATATTTGTTGGAATTATGATAATGCTTATTGTGATAAACTTTGTAAAGATAAAAAAGCTGATTCTGGTTATTGTTATTGGGTTCATATTCTTTGTTATTGTTATGGTCTTCCTGATTCTGAACCTACTAAAACTAATGGTAAATGTAAATCTGGTAAAAAA";
-		
-//		String[] seqArray = cas.getDocumentText().split(" ");
-//		System.out.println(seqArray[0]);
-//		System.out.println(seqArray[1]);
-//		System.out.println();
 		
 		// TODO: implement this
 		// translate each DNA sequence to a protein sequence considering
 		// all possible open reading frames and store in a CAS view
-//		String orf1_protein1 = dnaToProtein(seqArray[0], codonTable);
-//		String orf1_protein2 = dnaToProtein(seqArray[1], codonTable); 
 		try {
 			JCas orf1 = cas.createView("protein");
-			String proteinString = null;
-			for(int jjj = 0; jjj < 5; jjj++) {
-				System.out.println(proteins[jjj]);
-				proteinString += (proteins[jjj] + " "); 
-			}
+			String proteinString = ProteinSequenceAnnotator.combineStringArray(proteins);
 			orf1.setDocumentText(proteinString);
 		} catch (CASException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public static String combineStringArray(String[] array) {
+		String returnString = "";
+		for(int iii = 0; iii < array.length; iii++) {
+			returnString += (array[iii] + " ");
+		}
+		return returnString;
 	}
 
 	// This method should generate the protein sequence for the specified

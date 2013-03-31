@@ -14,20 +14,25 @@ public class SequenceAlignmentAnnotator extends JCasAnnotator_ImplBase  {
 	public void process(JCas cas) throws AnalysisEngineProcessException {
 		// read protein sequences from the CAS 
 		try {
-			String[] seqs = cas.getView("protein").getDocumentText().split(" ");
-			System.out.println(seqs[0]);
-			System.out.println(seqs[1]);
-			System.out.println(seqs[2]);
-			System.out.println(seqs[3]);
-			System.out.println(seqs[4]);
-			System.out.println();
-			// TODO: implement this	
-			String[] alignment = computeLevenshteinDistance(seqs[0], seqs[1]);
+			String[] proteins = cas.getView("protein").getDocumentText().split(" ");
+			// TODO: implement this
+			String[] alignment = getAllPairsAlignment(proteins);
 			JCas alignmentCas = cas.createView("alignment");
-			alignmentCas.setDocumentText(alignment[0] + " " + alignment[1]);
+			alignmentCas.setDocumentText(ProteinSequenceAnnotator.combineStringArray(alignment));
 		} catch (CASException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	private String[] getAllPairsAlignment(String[] proteins) {
+		String alignmentString = "";
+		for(int iii = 0; iii < (proteins.length - 1); iii++) {
+			for(int jjj = (iii + 1); jjj < proteins.length; jjj++) {
+				String[] singlePairAlignment = computeLevenshteinDistance(proteins[iii], proteins[jjj]);
+				alignmentString += (singlePairAlignment[0] + " " + singlePairAlignment[1]);
+			}
+		}
+		return alignmentString.split(" ");
 	}
 
 	// This method should compute a minimum cost alignment
@@ -80,18 +85,11 @@ public class SequenceAlignmentAnnotator extends JCasAnnotator_ImplBase  {
 			seq1 = temp;
 		}
 		
-		int[][] distances = new int[seq1.length() + 1][seq2.length() + 1];		// stores minimum cost
+		// Initialize values
+		int[][] distances = SequenceAlignmentAnnotator.initDistanceMatrix(seq1.length(), seq2.length());
+//		int[][] distances = new int[seq1.length() + 1][seq2.length() + 1];		// stores minimum cost
 		char[][] directions = new char[seq1.length()][seq2.length()];			// stores direction of previous minimum cost
-		
-		// Initialize value
-		distances[0][0] = 0;
-		for(int iii = 1; iii <= seq1.length(); iii++){
-			distances[iii][0] = iii * 2;
-		}
-		for(int jjj = 1; jjj <= seq2.length(); jjj++) {
-			distances[0][jjj] = jjj * 2;
-		}
-		
+			
 		for (int iii = 1; iii <= seq1.length(); iii++) {
 			for (int jjj = 1; jjj <= seq2.length(); jjj++) {
 				int diagonal = distances[iii - 1][jjj - 1];
@@ -112,5 +110,17 @@ public class SequenceAlignmentAnnotator extends JCasAnnotator_ImplBase  {
 			}
 		}
 		return getAlignment(distances, directions, seq1, seq2);
+	}
+	
+	private static int[][] initDistanceMatrix(int length1, int length2) {
+		int[][] distances = new int[length1 + 1][length2 + 1];
+		distances[0][0] = 0;
+		for(int iii = 1; iii <= length1; iii++){
+			distances[iii][0] = iii * 2;
+		}
+		for(int jjj = 1; jjj <= length2; jjj++) {
+			distances[0][jjj] = jjj * 2;
+		}
+		return distances;
 	}
 }
