@@ -1,5 +1,7 @@
 package bio.uima;
 
+import java.util.HashMap;
+
 import org.apache.uima.analysis_component.JCasAnnotator_ImplBase;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.cas.CASException;
@@ -12,7 +14,7 @@ public class SequenceAlignmentAnnotator extends JCasAnnotator_ImplBase  {
 
 	@Override
 	public void process(JCas cas) throws AnalysisEngineProcessException {
-		// read protein sequences from the CAS 
+		// read protein sequences from the CAS
 		try {
 			String[] proteins = cas.getView("protein").getDocumentText().split(" ");
 			// TODO: implement this
@@ -25,102 +27,116 @@ public class SequenceAlignmentAnnotator extends JCasAnnotator_ImplBase  {
 	}
 	
 	private String[] getAllPairsAlignment(String[] proteins) {
+		HashMap<Character, HashMap<Character, Integer>> distances = initDistancesMap();
 		String alignmentString = "";
 		for(int iii = 0; iii < (proteins.length - 1); iii++) {
 			for(int jjj = (iii + 1); jjj < proteins.length; jjj++) {
-				String[] singlePairAlignment = computeLevenshteinDistance(proteins[iii], proteins[jjj]);
+				String[] singlePairAlignment = getAlignment(proteins[iii], proteins[jjj], distances);
 				alignmentString += (singlePairAlignment[0] + " " + singlePairAlignment[1]);
 			}
 		}
 		return alignmentString.split(" ");
 	}
+	
+	/*
+	 * @param 	A			:	String to align
+	 * @param	B			:	String to align
+	 * @param	distances	:	HashMap that stores BLOSUM62 matrix
+	 * @return	alignment	:	Array of strings that contains the alignment of A and B
+	 */
+    private String[] getAlignment(String A, String B, HashMap<Character, HashMap<Character, Integer>> distances) {
+    	final int gapPenalty = -2;
+    	int[][] scores = computeNWScore(A, B, distances, gapPenalty);
+    	
+    	// Compute alignment
+    	String alignmentA = "";
+    	String alignmentB = "";
+    	int iii = A.length();
+    	int jjj = B.length();
+    	while (iii > 0 || jjj > 0)
+    	{
+    		if ((iii > 0 && jjj > 0) && (scores[iii][jjj] == scores[iii - 1][jjj - 1] + distances.get(A.charAt(iii - 1)).get(B.charAt(jjj - 1)))) {
+    			alignmentA = Character.toString(A.charAt(iii - 1)) + alignmentA;
+    			alignmentB = Character.toString(B.charAt(jjj - 1)) + alignmentB;
+    			iii--;
+    			jjj--;
+			} else if ((iii > 0) && (scores[iii][jjj] == scores[iii-1][jjj] + gapPenalty)) {
+				alignmentA = Character.toString(A.charAt(iii - 1)) + alignmentA;
+				alignmentB = Character.toString('-') + alignmentB;
+				iii--;
+			} else if((jjj > 0) && (scores[iii][jjj] == scores[iii][jjj - 1] + gapPenalty)) {
+				alignmentA = Character.toString('-') + alignmentA;
+				alignmentB = Character.toString(B.charAt(jjj - 1)) + alignmentB;
+				jjj--;
+			}
+    	}
+    	String[] alignment = {alignmentA, alignmentB};
+    	return alignment;
+    }
+    
+    /*
+     * @param	lengthA			: 	length of String A
+     * @param	lengthB			: 	length of String B
+     * @param	gapPenalty		:	indel penalty
+     * @return	scores			:	Initialized 2D int matrix to store alignment scores
+     */
+	private int[][] initDistanceMatrix(int lengthA, int lengthB, int gapPenalty) {
+		int[][] scores = new int[lengthA + 1][lengthB + 1];
+		for(int iii = 0; iii <= lengthA; iii++){
+			scores[iii][0] = iii * gapPenalty;
+		}
+		for(int jjj = 0; jjj <= lengthB; jjj++) {
+			scores[0][jjj] = jjj * gapPenalty;
+		}
+		return scores;
+	}
+	
+	/*
+	 * @param	A			:		String A to compute alignment scores
+	 * @param	B			:		String B to compute alignment scores
+	 * @param	distances	:		HashMap that stores BLOSUM62 matrix
+	 * @param	gapPenalty	:		indel penalty
+	 * @return	scores		:		calculated alignment scores		
+	 */
+	private int[][] computeNWScore(String A, String B, HashMap<Character, HashMap<Character, Integer>> distances, int gapPenalty) {
+    	int[][] scores = initDistanceMatrix(A.length(), B.length(), gapPenalty);
+    	for(int iii = 1; iii <= A.length(); iii++) {
+    		HashMap<Character, Integer> tempMap = distances.get(A.charAt(iii - 1));
+    		for(int jjj = 1; jjj <= B.length(); jjj++) {
+    			int value = tempMap.get(B.charAt(jjj - 1));
+    			int match = scores[iii - 1][jjj - 1] + value;
+    			int delete = scores[iii - 1][jjj] + gapPenalty;
+    			int insert = scores[iii][jjj - 1] + gapPenalty;
+    			scores[iii][jjj] = max(match, delete, insert);
+    		}
+    	}
+    	return scores;
+    }
 
-	// This method should compute a minimum cost alignment
-	// for the specified sequences.  The cost of an insertion
-	// or delete is 1 and the cost of substitution is 2.
-	// Return marked up strings where insertions/deletes are
-	// represented with a '-'.  
-	//
-	// For example an alignment of:
-	//
-	// 'AAGT' and 'AGT' 
-	//
-	// could be 
-	//
-	// {'AAGT', 'A-GT'}
-	//
-	
-	private String[] getAlignment(int[][] distances, char[][] directions, String seq1, String seq2) {
-		StringBuilder myStr = new StringBuilder(seq1);
-		int iii = seq1.length();
-		int jjj = seq2.length();
-		while(iii > 0 && jjj > 0) {
-			char currentDirection = directions[iii - 1][jjj - 1];
-			if(currentDirection == 'd') {
-				myStr.setCharAt(iii - 1, seq2.charAt(jjj - 1));
-				iii--;
-				jjj--;
-			} else if (currentDirection == 'u') {
-				myStr.setCharAt(iii - 1, '-');
-				iii--;
-			} else {
-//				myStr.setCharAt(iii - 1, '-');
-				jjj--;
-			}
-		}
-		while(iii > 0) {
-			myStr.setCharAt(--iii, '-');
-		}
-		String[] result = {seq1, myStr.toString()};
-		return result;
-	}
-	
-	private String[] computeLevenshteinDistance(String seq1, String seq2) {
-		// enforce that seq1 is longer than seq2
-		// if not, swap seq1 and seq2
-		// for ease of computation
-		if(seq1.length() < seq2.length()) {
-			String temp = seq2;
-			seq2 = seq1;
-			seq1 = temp;
-		}
-		
-		// Initialize values
-		int[][] distances = SequenceAlignmentAnnotator.initDistanceMatrix(seq1.length(), seq2.length());
-//		int[][] distances = new int[seq1.length() + 1][seq2.length() + 1];		// stores minimum cost
-		char[][] directions = new char[seq1.length()][seq2.length()];			// stores direction of previous minimum cost
-			
-		for (int iii = 1; iii <= seq1.length(); iii++) {
-			for (int jjj = 1; jjj <= seq2.length(); jjj++) {
-				int diagonal = distances[iii - 1][jjj - 1];
-				// Add cost 1 for substitution
-				if (seq1.charAt(iii - 1) != seq2.charAt(jjj - 1)) {
-					diagonal++;
-				}
-				if (diagonal <= Math.min(distances[iii - 1][jjj] + 2, distances[iii][jjj - 1] + 2)) {
-					distances[iii][jjj] = diagonal;
-					directions[iii - 1][jjj - 1] = 'd';
-				} else if (distances[iii - 1][jjj] <= distances[iii][jjj - 1]) {
-					distances[iii][jjj] = distances[iii - 1][jjj] + 2;		// add 2 to cost for insertion
-					directions[iii - 1][jjj - 1] = 'u';
-				} else {
-					distances[iii][jjj] = distances[iii][jjj - 1] + 2;		// add 2 to cost for deletion
-					directions[iii - 1][jjj - 1] = 'l';
-				}
-			}
-		}
-		return getAlignment(distances, directions, seq1, seq2);
-	}
-	
-	private static int[][] initDistanceMatrix(int length1, int length2) {
-		int[][] distances = new int[length1 + 1][length2 + 1];
-		distances[0][0] = 0;
-		for(int iii = 1; iii <= length1; iii++){
-			distances[iii][0] = iii * 2;
-		}
-		for(int jjj = 1; jjj <= length2; jjj++) {
-			distances[0][jjj] = jjj * 2;
-		}
-		return distances;
-	}
+	/*
+	 * 
+	 */
+	private static HashMap<Character, HashMap<Character, Integer>> initDistancesMap() {
+    	HashMap<Character, HashMap<Character, Integer>> distancesMap = new HashMap<Character, HashMap<Character, Integer>>(); 
+    	
+    	final String distancesFileName = "/home/farhang/workspace/BioUIMA/resources/distances.txt";
+    	String distancesFile = BioUima.readInputFile(distancesFileName);
+    	
+    	String[] distancesFileArray = distancesFile.split("\n");
+    	String[] firstLine = distancesFileArray[0].split("\t");
+    	
+    	for(int iii = 1; iii < distancesFileArray.length; iii++) {
+    		HashMap<Character, Integer> tempMap = new HashMap<Character, Integer>();
+    		String[] singleLineArray = distancesFileArray[iii].split("\t");
+    		for(int jjj = 0; jjj < singleLineArray.length; jjj++) {
+    			tempMap.put(firstLine[jjj].charAt(0), Integer.parseInt(singleLineArray[jjj]));
+    		}
+    		distancesMap.put(firstLine[iii - 1].charAt(0), tempMap);
+    	}
+    	return distancesMap;
+    }
+    
+    private static int max(int x, int y, int z) {
+    	return Math.max(x, Math.max(y, z));
+    }
 }
