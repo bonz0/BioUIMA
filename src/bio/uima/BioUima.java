@@ -72,19 +72,19 @@ public class BioUima {
 		String[] seqs = alignment.getDocumentText().split(" ");
 		BioUima.printStringArray(seqs);
 	}
-	
+
 	public static void printStringArray(String[] array) {
 		for(String temp : array) {
 			System.out.println(temp);
 		}
 		System.out.println();
 	}
-	
+
 	/*
 	 * @param 	inputFile		: File name to read from
 	 * @return	String read from input file
 	 */
-	private static String readInputFile(String inputFile) {
+	public static String readInputFile(String inputFile) {
 		BufferedReader br = null;
 		String fileText = "";
 		try {

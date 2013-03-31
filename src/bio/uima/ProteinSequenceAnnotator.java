@@ -6,9 +6,6 @@ import org.apache.uima.cas.CASException;
 import org.apache.uima.jcas.JCas;
 
 import java.util.HashMap;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.FileReader;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -30,7 +27,7 @@ public class ProteinSequenceAnnotator extends JCasAnnotator_ImplBase  {
 		String[] proteins = new String[5];
 		HashMap<String, String> codonTable = ProteinSequenceAnnotator.initMap();
 		
-		// Find DNA sequences, create annotations, and translate to protein sequences
+		// Find DNA sequences
 		int iii = 0;
 		int pos = 0;
 		while(matcher.find(pos)) {
@@ -86,26 +83,14 @@ public class ProteinSequenceAnnotator extends JCasAnnotator_ImplBase  {
 	 * Reads codon table from a file and creates a hash map.
 	 */
 	private static HashMap<String, String> initMap() {
-		HashMap<String, String> codonMap = new HashMap<String, String>();
 		final String codonFile = "/home/farhang/workspace/BioUIMA/resources/codonTable.txt";
-		BufferedReader br = null;
-		try {
-			String currentLine;
-			br = new BufferedReader(new FileReader(codonFile));
-			while ((currentLine = br.readLine()) != null) {
-				String[] array = currentLine.split("\t");
-				codonMap.put(array[0], array[1]);
-			}
-		} catch	(IOException e) {
-			e.printStackTrace();
-			System.out.println("File not found: " + codonFile);
-		} finally {
-				try {
-					if(br != null)	br.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-		}
-		return codonMap;
-	}
+    	String inputFileString = BioUima.readInputFile(codonFile);
+    	HashMap<String, String> codonMap = new HashMap<String, String>();
+    	String[] lines = inputFileString.split("\n");
+    	for(String line : lines) {
+    		String[] temp = line.split("\t");
+    		codonMap.put(temp[0], temp[1]);
+    	}
+    	return codonMap;
+    }
 }
