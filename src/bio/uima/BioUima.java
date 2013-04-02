@@ -81,7 +81,7 @@ public class BioUima {
 	}
 
 	/*
-	 * @param 	inputFile		: File name to read from
+	 * @param inputFile
 	 * @return	String read from input file
 	 */
 	public static String readInputFile(String inputFile) {

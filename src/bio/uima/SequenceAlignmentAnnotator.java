@@ -26,12 +26,17 @@ public class SequenceAlignmentAnnotator extends JCasAnnotator_ImplBase  {
 		}
 	}
 	
+	/*
+	 * @param	proteins		: Array of strings
+	 * @return Array of strings that contains alignment of all pairs of input String array
+	 */
 	private String[] getAllPairsAlignment(String[] proteins) {
 		HashMap<Character, HashMap<Character, Integer>> distances = initDistancesMap();
 		String alignmentString = "";
 		for(int iii = 0; iii < (proteins.length - 1); iii++) {
 			for(int jjj = (iii + 1); jjj < proteins.length; jjj++) {
-				String[] singlePairAlignment = getAlignment(proteins[iii], proteins[jjj], distances);
+//				String[] singlePairAlignment = getAlignment(proteins[iii], proteins[jjj], distances);
+				String[] singlePairAlignment = hirschberg(proteins[iii], proteins[jjj], distances);
 				alignmentString += (singlePairAlignment[0] + " " + singlePairAlignment[1]);
 			}
 		}
@@ -42,7 +47,7 @@ public class SequenceAlignmentAnnotator extends JCasAnnotator_ImplBase  {
 	 * @param 	A			:	String to align
 	 * @param	B			:	String to align
 	 * @param	distances	:	HashMap that stores BLOSUM62 matrix
-	 * @return	alignment	:	Array of strings that contains the alignment of A and B
+	 * @return	Array of two strings that are the optimal alignment of A and B
 	 */
 	private String[] getAlignment(String A, String B, HashMap<Character, HashMap<Character, Integer>> distances) {
 		final int gapPenalty = -2;
@@ -112,19 +117,89 @@ public class SequenceAlignmentAnnotator extends JCasAnnotator_ImplBase  {
 		}
 		return scores;
 	}
-
+	
 	/*
-	 * 
+	 * HIRSCHBERG
 	 */
+	private int[] computeLastNWScore(String A, String B, HashMap<Character, HashMap<Character, Integer>> distances, int gapPenalty) {
+		int[][] scores = computeNWScore(A, B, distances, gapPenalty);
+		int[] lastLine = new int[B.length() + 1];
+		for(int jjj = 0; jjj <= B.length(); jjj++) {
+			lastLine[jjj] = scores[A.length()][jjj];
+		}
+		return lastLine;
+	}
+	
+	/*
+	 * HIRSCHBERG
+	 */
+	private String[] hirschberg(String A, String B, HashMap<Character, HashMap<Character, Integer>> distances) {
+		final int gapPenalty = -2;
+		String Z = "";
+		String W = "";
+		if(A.length() == 0 || B.length() == 0) {
+			if(A.length() == 0) {
+				for(int jjj = 0; jjj < B.length(); jjj++) {
+					Z = Z + "-";
+					W = W + Character.toString(B.charAt(jjj));
+				}
+			} else {
+				for(int iii = 0; iii < A.length(); iii++) {
+					Z = Z + Character.toString(A.charAt(iii));
+					W = W + "-";
+				}
+			}
+		} else if (A.length() == 1 || B.length() == 1) {
+			String[] alignments = getAlignment(A, B, distances);
+			Z = Z + alignments[0];
+			W = W + alignments[1];
+		} else {
+			int midA = (int) (A.length() / 2);
+			int[] scoreL = computeLastNWScore(A.substring(0, midA), B, distances, gapPenalty);
+			int[] scoreR = computeLastNWScore(reverse(A.substring(midA)), reverse(B), distances, gapPenalty);
+			int midB = partition(scoreL, scoreR);
+			String[] leftAlignments = hirschberg(A.substring(0, midA), B.substring(0, midB), distances);
+			Z = Z + leftAlignments[0];
+			W = W + leftAlignments[1];	
+			String[] rightAlignments = hirschberg(A.substring(midA), B.substring(midB), distances);
+			Z = Z + rightAlignments[0];
+			W = W + rightAlignments[1];
+		}
+		String[] result = {Z, W};
+		return result;
+	}
+	
+	/*
+	 * HIRSCHBERG
+	 */
+	private static int partition(int[] scoreL, int[] scoreR) {
+		int maxSum = Integer.MIN_VALUE;
+		int index = 0;
+		for(int iii = 0; iii < scoreL.length; iii++) {
+			int sum = scoreL[iii] + scoreR[scoreL.length - iii - 1];
+			if(sum >= maxSum) {
+				maxSum = sum;
+				index = iii;
+			}
+		}
+		return index;
+	}
+	
+	/*
+	 * HIRSCHBERG
+	 */
+	private static String reverse(String inputString) {
+		if(inputString == null) return "";
+		if(inputString.length() == 1) return inputString;
+		return new StringBuilder(inputString).reverse().toString();
+	}
+
 	private static HashMap<Character, HashMap<Character, Integer>> initDistancesMap() {
 		HashMap<Character, HashMap<Character, Integer>> distancesMap = new HashMap<Character, HashMap<Character, Integer>>(); 
-		
 		final String distancesFileName = "/home/farhang/workspace/BioUIMA/resources/distances.txt";
 		String distancesFile = BioUima.readInputFile(distancesFileName);
-		
 		String[] distancesFileArray = distancesFile.split("\n");
 		String[] firstLine = distancesFileArray[0].split("\t");
-		
 		for(int iii = 1; iii < distancesFileArray.length; iii++) {
 			HashMap<Character, Integer> tempMap = new HashMap<Character, Integer>();
 			String[] singleLineArray = distancesFileArray[iii].split("\t");
@@ -136,6 +211,9 @@ public class SequenceAlignmentAnnotator extends JCasAnnotator_ImplBase  {
 		return distancesMap;
 	}
 
+	/*
+	 * Returns greatest of three integers
+	 */
 	private static int max(int x, int y, int z) {
 		return Math.max(x, Math.max(y, z));
 	}

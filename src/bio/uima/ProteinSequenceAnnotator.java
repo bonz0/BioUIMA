@@ -39,6 +39,7 @@ public class ProteinSequenceAnnotator extends JCasAnnotator_ImplBase  {
 			annotation.addToIndexes();
 			pos = matcher.end();
 		}
+		BioUima.printStringArray(proteins);
 
 		// TODO: implement this
 		// translate each DNA sequence to a protein sequence considering
