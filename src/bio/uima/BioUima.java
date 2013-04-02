@@ -74,9 +74,12 @@ public class BioUima {
 	}
 
 	public static void printStringArray(String[] array) {
-		for(String temp : array) {
-			System.out.println(temp);
+		for(int iii = 0; iii < array.length; iii++) {
+			System.out.println(iii + "->\t" + array[iii]);
 		}
+//		for(String temp : array) {
+//			System.out.println(temp);
+//		}
 		System.out.println();
 	}
 

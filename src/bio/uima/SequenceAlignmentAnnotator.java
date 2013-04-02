@@ -35,9 +35,8 @@ public class SequenceAlignmentAnnotator extends JCasAnnotator_ImplBase  {
 		String alignmentString = "";
 		for(int iii = 0; iii < (proteins.length - 1); iii++) {
 			for(int jjj = (iii + 1); jjj < proteins.length; jjj++) {
-//				String[] singlePairAlignment = getAlignment(proteins[iii], proteins[jjj], distances);
 				String[] singlePairAlignment = hirschberg(proteins[iii], proteins[jjj], distances);
-				alignmentString += (singlePairAlignment[0] + " " + singlePairAlignment[1]);
+				alignmentString += (singlePairAlignment[0] + " " + singlePairAlignment[1] + " ");
 			}
 		}
 		return alignmentString.split(" ");
