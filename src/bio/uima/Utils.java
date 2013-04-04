@@ -31,6 +31,7 @@ public class Utils {
 	
 	/*
 	 * Reads codon table from a file and creates a HashMap for quick lookup
+	 *
 	 * @return HashMap<String, String>		HashMap to map codons to protein
 	 */
 	public static HashMap<String, String> initCodonTable() {
@@ -51,6 +52,9 @@ public class Utils {
 		return Math.max(x, Math.max(y, z));
 	}
 
+	/*
+	 * Prints an array of Strings
+	 */
 	public static void printStringArray(String[] array) {
 		for(int iii = 0; iii < array.length; iii++) {
 			System.out.println(iii + "->\t" + array[iii]);
@@ -83,6 +87,9 @@ public class Utils {
 	}
 	
 	/*
+	 * Reads from a file and returns the string that represents
+	 * the data in the file.
+	 *
 	 * @param inputFile
 	 * @return	String read from input file
 	 */
