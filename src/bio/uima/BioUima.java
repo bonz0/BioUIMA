@@ -52,16 +52,19 @@ public class BioUima {
      *
 	 * @param args
 	 */
+	
+	private static final String INPUT_XML_FILE = "desc/BioDescriptor.xml";
+	private static final String INPUT_DNA_FILE = "/home/farhang/workspace/BioUIMA/data/dna.txt";
+	
 	public static void main(String[] args) throws Exception {
 		// create the AE
-		XMLInputSource input = new XMLInputSource("desc/BioDescriptor.xml");
+		XMLInputSource input = new XMLInputSource(INPUT_XML_FILE);
 		AnalysisEngineDescription desc = UIMAFramework.getXMLParser().parseAnalysisEngineDescription(input);
 		AnalysisEngine ae = UIMAFramework.produceAnalysisEngine(desc);
 
 		// init a CAS
 		JCas jCas = ae.newJCas();
-		final String inputFile = "/home/farhang/workspace/BioUIMA/data/dna.txt";
-		String fileText = BioUima.readInputFile(inputFile);
+		String fileText = Utils.readInputFile(INPUT_DNA_FILE);
 		jCas.setDocumentText(fileText);
 
 		// process the CAS
@@ -70,41 +73,6 @@ public class BioUima {
 		// print results to stdout
 		JCas alignment = jCas.getView("alignment");
 		String[] seqs = alignment.getDocumentText().split(" ");
-		BioUima.printStringArray(seqs);
-	}
-
-	public static void printStringArray(String[] array) {
-		for(int iii = 0; iii < array.length; iii++) {
-			System.out.println(iii + "->\t" + array[iii]);
-		}
-//		for(String temp : array) {
-//			System.out.println(temp);
-//		}
-		System.out.println();
-	}
-
-	/*
-	 * @param inputFile
-	 * @return	String read from input file
-	 */
-	public static String readInputFile(String inputFile) {
-		BufferedReader br = null;
-		String fileText = "";
-		try {
-			br = new BufferedReader(new FileReader(inputFile));
-			String currentLine;
-			while((currentLine = br.readLine()) != null) {
-				fileText += (currentLine + "\n");
-			}
-		} catch(IOException e) {
-			System.out.println("File not found: " + inputFile);
-		} finally {
-			try {
-				if(br != null)	br.close();
-			} catch(IOException e) {
-				e.printStackTrace();
-			}
-		}
-		return fileText;
+		Utils.printStringArray(seqs);
 	}
 }
