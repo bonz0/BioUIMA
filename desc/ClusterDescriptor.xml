@@ -1,32 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <analysisEngineDescription xmlns="http://uima.apache.org/resourceSpecifier">
   <frameworkImplementation>org.apache.uima.java</frameworkImplementation>
-  <primitive>false</primitive>
-  <delegateAnalysisEngineSpecifiers>
-    <delegateAnalysisEngine key="ClusterDescriptor">
-      <import location="ClusterDescriptor.xml"/>
-    </delegateAnalysisEngine>
-    <delegateAnalysisEngine key="SequenceAlignmentDescriptor">
-      <import location="SequenceAlignmentDescriptor.xml"/>
-    </delegateAnalysisEngine>
-    <delegateAnalysisEngine key="ProteinSequenceDescriptor">
-      <import location="ProteinSequenceDescriptor.xml"/>
-    </delegateAnalysisEngine>
-  </delegateAnalysisEngineSpecifiers>
+  <primitive>true</primitive>
+  <annotatorImplementationName>bio.uima.ClusterAnnotator</annotatorImplementationName>
   <analysisEngineMetaData>
-    <name>BioDescriptor</name>
+    <name>ClusterDescriptor</name>
     <description/>
     <version>1.0</version>
     <vendor/>
     <configurationParameters/>
     <configurationParameterSettings/>
-    <flowConstraints>
-      <fixedFlow>
-        <node>ProteinSequenceDescriptor</node>
-        <node>SequenceAlignmentDescriptor</node>
-        <node>ClusterDescriptor</node>
-      </fixedFlow>
-    </flowConstraints>
+    <typeSystemDescription/>
+    <typePriorities/>
     <fsIndexCollection/>
     <capabilities>
       <capability>

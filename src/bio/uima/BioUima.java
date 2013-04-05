@@ -71,8 +71,11 @@ public class BioUima {
 		ae.process(jCas);
 
 		// print results to stdout
-		JCas alignment = jCas.getView("alignment");
-		String[] seqs = alignment.getDocumentText().split(" ");
-		Utils.printStringArray(seqs);
+		JCas clusterView = jCas.getView("clusters");
+		JCas alignmentView = jCas.getView("alignments");
+		String[] alignments = alignmentView.getDocumentText().split(" ");
+		String[] clusters = clusterView.getDocumentText().split(" ");
+		System.out.println("Cluster\tProtein alignment");
+		Utils.printTwoStringArrays(clusters, alignments);
 	}
 }

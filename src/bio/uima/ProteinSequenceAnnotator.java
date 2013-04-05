@@ -53,10 +53,10 @@ public class ProteinSequenceAnnotator extends JCasAnnotator_ImplBase  {
 		}
 		
 		try {
-			JCas orf1 = cas.createView("protein");							// create a view for proteins
+			JCas orf1 = cas.createView("proteins");							// create a view for proteins
 			String proteinString = Utils.combineStringArray(proteins.toArray(new String[proteins.size()]));
 			orf1.setDocumentText(proteinString);
-			JCas orf2 = cas.createView("dna");								// create separate view for DNA
+			JCas orf2 = cas.createView("dnas");								// create separate view for DNA
 			String dnaString = Utils.combineStringArray(inputDNA);
 			orf2.setDocumentText(dnaString);
 		} catch (CASException e) {

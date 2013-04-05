@@ -63,6 +63,16 @@ public class Utils {
 	}
 	
 	/*
+	 * Prints an array of Strings
+	 */
+	public static void printTwoStringArrays(String[] array1, String[] array2) {
+		for(int iii = 0; iii < array1.length; iii++) {
+			System.out.println(array1[iii] + "\t" + array2[iii]);
+		}
+		System.out.println();
+	}
+	
+	/*
 	 * Adds an array of strings to an ArrayList of strings
 	 */
 	public static void addArrayToList(ArrayList<String> proteins, String[] newProteins) {
@@ -79,6 +89,21 @@ public class Utils {
 	 * @return						String of concatenation of input string array
 	 */
 	public static String combineStringArray(String[] proteins) {
+		String returnString = "";
+		for(int iii = 0; iii < proteins.length; iii++) {
+			returnString += (proteins[iii] + " ");
+		}
+		return returnString;
+	}
+	
+	/*
+	 * Combines an input integer array to output one single string which is separated
+	 * by a space for each element in the array
+	 * 
+	 * @param	proteins			input integer array to combine
+	 * @return						String of concatenation of input integer array
+	 */
+	public static String combineIntArray(int[] proteins) {
 		String returnString = "";
 		for(int iii = 0; iii < proteins.length; iii++) {
 			returnString += (proteins[iii] + " ");

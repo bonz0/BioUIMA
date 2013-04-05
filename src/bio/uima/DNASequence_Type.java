@@ -14,7 +14,7 @@ import org.apache.uima.cas.Feature;
 import org.apache.uima.jcas.tcas.Annotation_Type;
 
 /** 
- * Updated by JCasGen Sat Mar 30 12:57:05 EDT 2013
+ * Updated by JCasGen Thu Apr 04 23:16:27 EDT 2013
  * @generated */
 public class DNASequence_Type extends Annotation_Type {
   /** @generated */
@@ -69,6 +69,8 @@ public class DNASequence_Type extends Annotation_Type {
   public DNASequence_Type(JCas jcas, Type casType) {
     super(jcas, casType);
     casImpl.getFSClassRegistry().addGeneratorForType((TypeImpl)this.casType, getFSGenerator());
+
+ 
     casFeat_value = jcas.getRequiredFeatureDE(casType, "value", "uima.cas.String", featOkTst);
     casFeatCode_value  = (null == casFeat_value) ? JCas.INVALID_FEATURE_CODE : ((FeatureImpl)casFeat_value).getCode();
 

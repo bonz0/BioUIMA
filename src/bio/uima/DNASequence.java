@@ -11,8 +11,8 @@ import org.apache.uima.jcas.tcas.Annotation;
 
 
 /** 
- * Updated by JCasGen Sat Mar 30 12:57:05 EDT 2013
- * XML source: /home/farhang/workspace/BioUIMA/desc/ProteinSequenceDescriptor.xml
+ * Updated by JCasGen Thu Apr 04 23:16:27 EDT 2013
+ * XML source: /home/farhang/workspace/BioUIMA/desc/BioDescriptor.xml
  * @generated */
 public class DNASequence extends Annotation {
   /** @generated
