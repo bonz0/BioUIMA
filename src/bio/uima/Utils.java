@@ -129,6 +129,7 @@ public class Utils {
 			}
 		} catch(IOException e) {
 			System.out.println("File not found: " + inputFile);
+			System.exit(-1);
 		} finally {
 			try {
 				if(br != null)	br.close();

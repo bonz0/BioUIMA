@@ -13,7 +13,7 @@ import org.apache.uima.jcas.JCas;
 public class ClusterAnnotator extends JCasAnnotator_ImplBase {
 	private static int GAP_PENALTY = -2;													// Penalty for insertion or deletion
 	private static HashMap<Character, HashMap<Character, Integer>> distances = Utils.initSimilarityMap();		// BLOSUM62 matrix
-	private static int currentEpsilon = 10;
+	private static int currentEpsilon = 30;
 	private static int minPoints = 3;
 	
 	@Override
